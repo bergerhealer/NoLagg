@@ -4,17 +4,16 @@
 
   <groupId>com.bergerkiller.bukkit</groupId>
   <artifactId>NoLagg</artifactId>
-  <version>1.90.6-SNAPSHOT</version>
+  <version>1.91-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>NoLagg</name>
-  <url>http://dev.bukkit.org/server-mods/nolagg/</url>
+  <url>https://github.com/bergerhealer/nolagg/</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.spinotversion>1.7.10-R0.1-SNAPSHOT</project.spinotversion>
-    <project.cbversion>1.7.10-R0.1-SNAPSHOT</project.cbversion>
-    <project.bkcversion>1.59-SNAPSHOT</project.bkcversion>
+    <project.cbversion>1.8.7-R0.1-SNAPSHOT</project.cbversion>
+    <project.bkcversion>1.63-SNAPSHOT</project.bkcversion>
   </properties>
 
   <repositories>
@@ -25,8 +24,8 @@
     </repository>
     <!-- Repo for access to BKCommonLib -->
     <repository>
-      <id>dj-tcraft-repo</id>
-      <url>http://ci.dj-tcraft.nl/plugin/repository/everything/</url>
+      <id>mg-dev-repo</id>
+      <url>http://maven.mg-dev.eu/</url>
     </repository>
     <!-- Repo for access to Spigot -->
     <repository>
@@ -36,7 +35,7 @@
     <!-- Repo for access to CraftBukkit -->
     <repository>
       <id>bukkit-repo</id>
-      <url>http://repo.bukkit.org/content/groups/public</url>
+      <url>http://hub.spigotmc.org/nexus/content/groups/public/</url>
     </repository> 
   </repositories>
 
@@ -47,13 +46,6 @@
       <version>${project.cbversion}</version>
       <scope>provided</scope>
     </dependency> 
-    <dependency>
-      <groupId>org.spinotmc</groupId>
-      <artifactId>spinot</artifactId>
-      <version>${project.spinotversion}</version>
-      <scope>provided</scope>
-      <optional>true</optional>
-    </dependency>
     <dependency>
       <groupId>com.lishid.orebfuscator</groupId>
       <artifactId>Orebfuscator</artifactId>
