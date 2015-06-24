@@ -13,52 +13,52 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 
 public class NLIListener implements Listener {
 
-	@EventHandler(priority = EventPriority.HIGHEST)
-	public void onItemSpawn(ItemSpawnEvent event) {
-		if (event.getEntityType() == EntityType.DROPPED_ITEM) {
-			if(NoLaggItemBuffer.shouldIgnore(event.getEntity()))
-				return;
-			
-			if (!ItemMap.addItem(event.getEntity())) {
-				event.setCancelled(true);
-			}
-		}
-	}
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onItemSpawn(ItemSpawnEvent event) {
+        if (event.getEntityType() == EntityType.DROPPED_ITEM) {
+            if (NoLaggItemBuffer.shouldIgnore(event.getEntity()))
+                return;
 
-	public void onItemDespawn(Item item) {
-		if (item.getType() == EntityType.DROPPED_ITEM) {
-			if(NoLaggItemBuffer.shouldIgnore(item)) {
-				NoLaggItemBuffer.remove(item);
-			} else {
-				ItemMap.removeItem(item);
-			}
-		}
-	}
+            if (!ItemMap.addItem(event.getEntity())) {
+                event.setCancelled(true);
+            }
+        }
+    }
 
-	@EventHandler(priority = EventPriority.MONITOR)
-	public void onItemDespawn(ItemDespawnEvent event) {
-		if (!event.isCancelled()) {
-			onItemDespawn(event.getEntity());
-		}
-	}
+    public void onItemDespawn(Item item) {
+        if (item.getType() == EntityType.DROPPED_ITEM) {
+            if (NoLaggItemBuffer.shouldIgnore(item)) {
+                NoLaggItemBuffer.remove(item);
+            } else {
+                ItemMap.removeItem(item);
+            }
+        }
+    }
 
-	@EventHandler(priority = EventPriority.MONITOR)
-	public void onItemPickup(PlayerPickupItemEvent event) {
-		if (!event.isCancelled()) {
-			onItemDespawn(event.getItem());
-		}
-	}
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onItemDespawn(ItemDespawnEvent event) {
+        if (!event.isCancelled()) {
+            onItemDespawn(event.getEntity());
+        }
+    }
 
-	@EventHandler(priority = EventPriority.LOWEST)
-	public void onChunkLoad(ChunkLoadEvent event) {
-		ItemMap.loadChunk(event.getChunk());
-	}
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onItemPickup(PlayerPickupItemEvent event) {
+        if (!event.isCancelled()) {
+            onItemDespawn(event.getItem());
+        }
+    }
 
-	@EventHandler(priority = EventPriority.MONITOR)
-	public void onChunkUnload(ChunkUnloadEvent event) {
-		if (!event.isCancelled()) {
-			ItemMap.unloadChunk(event.getChunk());
-		}
-	}
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onChunkLoad(ChunkLoadEvent event) {
+        ItemMap.loadChunk(event.getChunk());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onChunkUnload(ChunkUnloadEvent event) {
+        if (!event.isCancelled()) {
+            ItemMap.unloadChunk(event.getChunk());
+        }
+    }
 
 }

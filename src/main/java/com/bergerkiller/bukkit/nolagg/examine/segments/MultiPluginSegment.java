@@ -11,41 +11,41 @@ import java.util.Map.Entry;
  */
 public class MultiPluginSegment extends SegmentNode {
 
-	public static MultiPluginSegment create(int duration, List<DataSegment> segments) {
-		Map<String, List<DataSegment>> pluginsegments = new LinkedHashMap<String, List<DataSegment>>();
-		for (DataSegment seg : segments) {
-			List<DataSegment> plist = pluginsegments.get(seg.getPlugin());
-			if (plist == null) {
-				plist = new ArrayList<DataSegment>();
-				pluginsegments.put(seg.getPlugin(), plist);
-			}
-			plist.add(seg.clone());
-		}
+    public MultiPluginSegment(int duration, List<PluginSegment> plugins) {
+        super("Plugins", duration, plugins);
+    }
 
-		// sort
-		List<PluginSegment> plugins = new ArrayList<PluginSegment>();
-		for (Entry<String, List<DataSegment>> entry : pluginsegments.entrySet()) {
-			trySort(entry.getValue());
-			plugins.add(new PluginSegment(entry.getKey(), duration, entry.getValue()));
-		}
-		trySort(plugins);
+    public static MultiPluginSegment create(int duration, List<DataSegment> segments) {
+        Map<String, List<DataSegment>> pluginsegments = new LinkedHashMap<String, List<DataSegment>>();
+        for (DataSegment seg : segments) {
+            List<DataSegment> plist = pluginsegments.get(seg.getPlugin());
+            if (plist == null) {
+                plist = new ArrayList<DataSegment>();
+                pluginsegments.put(seg.getPlugin(), plist);
+            }
+            plist.add(seg.clone());
+        }
 
-		return new MultiPluginSegment(duration, plugins);
-	}
+        // sort
+        List<PluginSegment> plugins = new ArrayList<PluginSegment>();
+        for (Entry<String, List<DataSegment>> entry : pluginsegments.entrySet()) {
+            trySort(entry.getValue());
+            plugins.add(new PluginSegment(entry.getKey(), duration, entry.getValue()));
+        }
+        trySort(plugins);
 
-	@Override
-	public int getPluginCount() {
-		return this.getChildren().length;
-	}
+        return new MultiPluginSegment(duration, plugins);
+    }
 
-	public MultiPluginSegment(int duration, List<PluginSegment> plugins) {
-		super("Plugins", duration, plugins);
-	}
+    @Override
+    public int getPluginCount() {
+        return this.getChildren().length;
+    }
 
-	@Override
-	public String getDescription() {
-		StringBuilder builder = new StringBuilder(super.getDescription());
-		builder.append('\n').append("Plugin count: ").append(this.getPluginCount());
-		return builder.toString();
-	}
+    @Override
+    public String getDescription() {
+        StringBuilder builder = new StringBuilder(super.getDescription());
+        builder.append('\n').append("Plugin count: ").append(this.getPluginCount());
+        return builder.toString();
+    }
 }

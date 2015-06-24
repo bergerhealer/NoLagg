@@ -10,23 +10,23 @@ import org.bukkit.event.world.WorldUnloadEvent;
 
 public class TLNListener implements Listener {
 
-	@EventHandler(priority = EventPriority.MONITOR)
-	public void onWorldInit(WorldInitEvent event) {
-		ThreadLockChecker.ignored = true;
-	}
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onWorldInit(WorldInitEvent event) {
+        ThreadLockChecker.ignored = true;
+    }
 
-	@EventHandler(priority = EventPriority.MONITOR)
-	public void onWorldLoad(WorldLoadEvent event) {
-		ThreadLockChecker.ignored = true;
-	}
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onWorldLoad(WorldLoadEvent event) {
+        ThreadLockChecker.ignored = true;
+    }
 
-	@EventHandler(priority = EventPriority.MONITOR)
-	public void onWorldUnload(WorldUnloadEvent event) {
-		ThreadLockChecker.ignored = true;
-	}
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onWorldUnload(WorldUnloadEvent event) {
+        ThreadLockChecker.ignored = true;
+    }
 
-	@EventHandler(priority = EventPriority.MONITOR)
-	public void onPluginDisable(PluginDisableEvent event) {
-		ThreadLockChecker.ignored = true;
-	}
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPluginDisable(PluginDisableEvent event) {
+        ThreadLockChecker.ignored = true;
+    }
 }

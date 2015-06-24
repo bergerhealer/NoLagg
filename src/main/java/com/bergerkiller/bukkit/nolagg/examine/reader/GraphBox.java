@@ -1,90 +1,87 @@
 package com.bergerkiller.bukkit.nolagg.examine.reader;
 
-import java.awt.Dimension;
-
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
+import javax.swing.*;
+import java.awt.*;
 
 public abstract class GraphBox extends JPanel {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private JScrollPane scroller;
-	private Graph graph;
+    private JScrollPane scroller;
+    private Graph graph;
 
-	public abstract void onSelectionChange(GraphArea newarea);
+    public GraphBox(int x, int y, int width, int height) {
+        final GraphBox me = this;
 
-	public abstract void onAreaClick(GraphArea area);
+        // adjust size and set layout
+        this.setLayout(null);
 
-	public void orderAreas() {
-		this.graph.orderAreas();
-	}
+        // construct components
+        this.graph = new Graph(this) {
+            private static final long serialVersionUID = 1L;
 
-	public void reset(int newduration) {
-		this.graph.reset(newduration);
-	}
+            @Override
+            public void onSelectionChange(GraphArea newarea) {
+                me.onSelectionChange(newarea);
+            }
 
-	public GraphArea addArea() {
-		return this.graph.addArea();
-	}
+            @Override
+            public void onAreaClick(GraphArea area) {
+                me.onAreaClick(area);
+            }
+        };
+        this.scroller = new JScrollPane(graph);
 
-	public void setSelection(int index) {
-		this.graph.setSelection(index);
-	}
+        this.scroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 
-	public GraphArea getArea(int index) {
-		return this.graph.getArea(index);
-	}
+        this.setBounds(x, y, width, height);
 
-	@Override
-	public void setBounds(int x, int y, int width, int height) {
-		super.setBounds(x, y, width, height);
-		this.scroller.setBounds(0, 0, width, height);
-	}
+        // add components
+        this.add(graph);
+        this.add(scroller);
 
-	/**
-	 * Gets the minimum x coordinate this graph box shows of the contents
-	 * 
-	 * @return minimum x coordinate
-	 */
-	public int getMinViewX() {
-		return this.scroller.getHorizontalScrollBar().getValue();
-	}
+        this.scroller.getViewport().add(this.graph);
+        this.scroller.setBounds(0, 0, width, height);
+        this.graph.setBounds(0, 0, width, height);
+        this.graph.setPreferredSize(new Dimension(width, 0));
+    }
 
-	public GraphBox(int x, int y, int width, int height) {
-		final GraphBox me = this;
+    public abstract void onSelectionChange(GraphArea newarea);
 
-		// adjust size and set layout
-		this.setLayout(null);
+    public abstract void onAreaClick(GraphArea area);
 
-		// construct components
-		this.graph = new Graph(this) {
-			private static final long serialVersionUID = 1L;
+    public void orderAreas() {
+        this.graph.orderAreas();
+    }
 
-			@Override
-			public void onSelectionChange(GraphArea newarea) {
-				me.onSelectionChange(newarea);
-			}
+    public void reset(int newduration) {
+        this.graph.reset(newduration);
+    }
 
-			@Override
-			public void onAreaClick(GraphArea area) {
-				me.onAreaClick(area);
-			}
-		};
-		this.scroller = new JScrollPane(graph);
+    public GraphArea addArea() {
+        return this.graph.addArea();
+    }
 
-		this.scroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+    public void setSelection(int index) {
+        this.graph.setSelection(index);
+    }
 
-		this.setBounds(x, y, width, height);
+    public GraphArea getArea(int index) {
+        return this.graph.getArea(index);
+    }
 
-		// add components
-		this.add(graph);
-		this.add(scroller);
+    @Override
+    public void setBounds(int x, int y, int width, int height) {
+        super.setBounds(x, y, width, height);
+        this.scroller.setBounds(0, 0, width, height);
+    }
 
-		this.scroller.getViewport().add(this.graph);
-		this.scroller.setBounds(0, 0, width, height);
-		this.graph.setBounds(0, 0, width, height);
-		this.graph.setPreferredSize(new Dimension(width, 0));
-	}
+    /**
+     * Gets the minimum x coordinate this graph box shows of the contents
+     *
+     * @return minimum x coordinate
+     */
+    public int getMinViewX() {
+        return this.scroller.getHorizontalScrollBar().getValue();
+    }
 
 }

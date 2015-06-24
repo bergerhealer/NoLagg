@@ -7,10 +7,10 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 
 public class NLLListener implements Listener {
 
-	@EventHandler(priority = EventPriority.LOWEST)
-	public void onChunkUnload(ChunkUnloadEvent event) {
-		if (LightingService.isProcessing(event.getChunk())) {
-			event.setCancelled(true);
-		}
-	}
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onChunkUnload(ChunkUnloadEvent event) {
+        if (LightingService.isProcessing(event.getChunk())) {
+            event.setCancelled(true);
+        }
+    }
 }
