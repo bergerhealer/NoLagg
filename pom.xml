@@ -4,7 +4,7 @@
 
     <groupId>com.bergerkiller.bukkit</groupId>
     <artifactId>NoLagg</artifactId>
-    <version>1.91-SNAPSHOT</version>
+    <version>1.92-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>NoLagg</name>
@@ -12,45 +12,38 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.cbversion>1.8.7-R0.1-SNAPSHOT</project.cbversion>
-        <project.bkcversion>1.63-SNAPSHOT</project.bkcversion>
+        <project.mcversion>v1_11_R1</project.mcversion>
+        <project.bversion>1.11.2-R0.1</project.bversion>
+        <project.cbversion>1.11.2-R0.1</project.cbversion>
+        <project.bkcversion>1.8-SNAPSHOT</project.bkcversion>
     </properties>
 
     <repositories>
-        <!-- Repo for access to Vault -->
-        <repository>
-            <id>herocraft-repo</id>
-            <url>http://nexus.theyeticave.net/content/repositories/pub_releases</url>
-        </repository>
-        <!-- Repo for access to BKCommonLib -->
-        <repository>
-            <id>mg-dev-repo</id>
-            <url>http://maven.mg-dev.eu/</url>
-        </repository>
-        <!-- Repo for access to Spigot -->
-        <repository>
-            <id>md-5 - repository</id>
-            <url>http://repo.md-5.net/content/repositories/public/</url>
-        </repository>
         <!-- Repo for access to CraftBukkit -->
         <repository>
-            <id>bukkit-repo</id>
-            <url>http://hub.spigotmc.org/nexus/content/groups/public/</url>
+          <id>spigot-repo</id>
+          <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
+        </repository>
+
+        <!-- Repo for access to Vault -->
+        <repository>
+        	<id>vault-repo</id>
+        	<url>http://nexus.hc.to/content/repositories/pub_releases</url>
         </repository>
     </repositories>
 
     <dependencies>
         <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>bukkit</artifactId>
-            <version>1.8.7-R0.1-SNAPSHOT</version>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
+            <version>${project.bversion}-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>craftbukkit</artifactId>
-            <version>1.8.7-R0.1-SNAPSHOT</version>
+            <version>${project.cbversion}-SNAPSHOT</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/spigot.jar</systemPath>
+            <systemPath>${project.basedir}/lib/spigot-1.11.2.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.lishid.orebfuscator</groupId>
