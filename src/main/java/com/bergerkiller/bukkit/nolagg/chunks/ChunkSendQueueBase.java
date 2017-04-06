@@ -3,11 +3,11 @@ package com.bergerkiller.bukkit.nolagg.chunks;
 import com.bergerkiller.bukkit.common.ActiveState;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.reflection.classes.VectorRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.bergerkiller.bukkit.nolagg.NoLagg;
+import com.bergerkiller.reflection.net.minecraft.server.NMSVector;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -64,7 +64,7 @@ public abstract class ChunkSendQueueBase extends LinkedList {
     public LinkedList toLinkedList() {
         LinkedList value = new LinkedList();
         for (long key : this.contained) {
-            value.add(VectorRef.newPair(MathUtil.longHashMsw(key), MathUtil.longHashLsw(key)));
+            value.add(NMSVector.newPair(MathUtil.longHashMsw(key), MathUtil.longHashLsw(key)));
         }
         return value;
     }
@@ -135,7 +135,7 @@ public abstract class ChunkSendQueueBase extends LinkedList {
     @Override
     public synchronized boolean contains(Object o) {
         try {
-            return this.contained.contains(VectorRef.getPairX(o), VectorRef.getPairZ(o));
+            return this.contained.contains(NMSVector.getPairX(o), NMSVector.getPairZ(o));
         } catch (Throwable t) {
             NoLagg.plugin.handle(t);
             return false;

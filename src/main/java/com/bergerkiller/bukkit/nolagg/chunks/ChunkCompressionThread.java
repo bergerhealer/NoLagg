@@ -1,14 +1,16 @@
 package com.bergerkiller.bukkit.nolagg.chunks;
 
 import com.bergerkiller.bukkit.common.AsyncTask;
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
-import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
-import com.bergerkiller.bukkit.common.reflection.classes.ChunkRef;
-import com.bergerkiller.bukkit.common.reflection.classes.ChunkSectionRef;
-import com.bergerkiller.bukkit.common.reflection.classes.NibbleArrayRef;
-import com.bergerkiller.bukkit.common.reflection.classes.WorldRef;
+import com.bergerkiller.reflection.MethodAccessor;
+import com.bergerkiller.reflection.net.minecraft.server.NMSChunk;
+import com.bergerkiller.reflection.net.minecraft.server.NMSChunkSection;
+import com.bergerkiller.reflection.net.minecraft.server.NMSNibbleArray;
+import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
+
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -22,7 +24,7 @@ public class ChunkCompressionThread extends AsyncTask {
      * - Biome data, one byte for each column, 16 x 16
      */
     private static final int MAX_CHUNK_DATA_LENGTH = (16 * 5 * 2048) + (16 * 16);
-    private static final Class<?>[] SPIGOT_OBFUSCATE_ARGS = {int.class, int.class, int.class, byte[].class, WorldRef.TEMPLATE.getType()};
+    private static final Class<?>[] SPIGOT_OBFUSCATE_ARGS = {int.class, int.class, int.class, byte[].class, NMSWorld.T.getType()};
     // create a cyclic player compression queue loop
     private static int queueIndex = 0;
     private static int idleCounter = 0;
@@ -133,13 +135,13 @@ public class ChunkCompressionThread extends AsyncTask {
 
     public CommonPacket createPacket(org.bukkit.Chunk bchunk) {
         Object chunk = Conversion.toChunkHandle.convert(bchunk);
-        Object world = ChunkRef.world.get(chunk);
-        Object worldProvider = ChunkRef.worldProvider.get(world);
-        boolean hasSkylight = !ChunkRef.hasSkyLight.get(worldProvider);
+        Object world = NMSChunk.world.get(chunk);
+        Object worldProvider = NMSChunk.worldProvider.get(world);
+        boolean hasSkylight = !NMSChunk.hasSkyLight.get(worldProvider);
         // Version which uses the Chunkmap buffer to create the packet
         CommonPacket mapchunk = new CommonPacket(PacketType.OUT_MAP_CHUNK);
-        PacketType.OUT_MAP_CHUNK.x.set(mapchunk.getHandle(), ChunkRef.x.get(chunk));
-        PacketType.OUT_MAP_CHUNK.z.set(mapchunk.getHandle(), ChunkRef.z.get(chunk));
+        PacketType.OUT_MAP_CHUNK.x.set(mapchunk.getHandle(), NMSChunk.x.get(chunk));
+        PacketType.OUT_MAP_CHUNK.z.set(mapchunk.getHandle(), NMSChunk.z.get(chunk));
         PacketType.OUT_MAP_CHUNK.hasBiomeData.set(mapchunk.getHandle(), true); //yes, has biome data
 
         // =====================================
@@ -150,12 +152,13 @@ public class ChunkCompressionThread extends AsyncTask {
         int i;
 
         // Calculate the available chunk sections and bitmap
-        Object sections[] = ChunkRef.sections.invoke(chunk);
+        Object sections[] = NMSChunk.sections.invoke(chunk);
         boolean sectionsEmpty[] = new boolean[sections.length];
         for (i = 0; i < sections.length; i++) {
-            sectionsEmpty[i] = sections[i] == null || ChunkSectionRef.isEmpty.invoke(sections[i]);
+            sectionsEmpty[i] = sections[i] == null || NMSChunkSection.isEmpty.invoke(sections[i]);
             if (!sectionsEmpty[i]) {
                 chunkDataBitMap |= 1 << i;
+                Logging.LOGGER_DEBUG.warnOnce("Shits not correctly implemented over here?");
                 /*
 				if (ChunkSectionRef.getExtBlockIds.invoke(sections[i]) != null) {
 					chunkBiomeBitMap |= 1 << i;
@@ -177,7 +180,8 @@ public class ChunkCompressionThread extends AsyncTask {
             this.rawLength = 0;
             for (i = 0; i < sections.length; i++) {
                 if (!sectionsEmpty[i]) {
-                    rawAppend(ChunkSectionRef.getBlockIds.invoke(sections[i]));
+                    throw new RuntimeException("Shits broken over here, too!");
+                    //rawAppend(NMSChunkSection.getBlockIds.invoke(sections[i]));
                 }
             }
 			/*
@@ -190,8 +194,8 @@ public class ChunkCompressionThread extends AsyncTask {
 			*/
             for (i = 0; i < sections.length; i++) {
                 if (!sectionsEmpty[i]) {
-                    Object nibble = ChunkSectionRef.getBlockLightNibble.invoke(sections[i]);
-                    this.rawLength = NibbleArrayRef.copyTo(nibble, this.rawbuffer, this.rawLength);
+                    Object nibble = NMSChunkSection.getBlockLightNibble.invoke(sections[i]);
+                    this.rawLength = NMSNibbleArray.copyTo(nibble, this.rawbuffer, this.rawLength);
                 }
             }
 
@@ -199,8 +203,8 @@ public class ChunkCompressionThread extends AsyncTask {
             if (hasSkylight) {
                 for (i = 0; i < sections.length; i++) {
                     if (!sectionsEmpty[i]) {
-                        Object nibble = ChunkSectionRef.getSkyLightNibble.invoke(sections[i]);
-                        this.rawLength = NibbleArrayRef.copyTo(nibble, this.rawbuffer, this.rawLength);
+                        Object nibble = NMSChunkSection.getSkyLightNibble.invoke(sections[i]);
+                        this.rawLength = NMSNibbleArray.copyTo(nibble, this.rawbuffer, this.rawLength);
                     }
                 }
             }
@@ -214,11 +218,11 @@ public class ChunkCompressionThread extends AsyncTask {
 			}*/
         }
         // Biome information
-        rawAppend(ChunkRef.biomeData.invoke(chunk));
+        rawAppend(NMSChunk.biomeData.invoke(chunk));
         // =====================================
 
         // Set data in packet
-        mapchunk.write(chunkDataBitMap, PacketType.OUT_MAP_CHUNK.chunkDataBitMap);
+        mapchunk.write(chunkDataBitMap, PacketType.OUT_MAP_CHUNK.sectionsMask);
         //mapchunk.write(PacketType.OUT_MAP_CHUNK.chunkBiomeBitMap, chunkBiomeBitMap);
         //mapchunk.write(PacketType.OUT_MAP_CHUNK.size, this.rawLength);
         //mapchunk.write(PacketType.OUT_MAP_CHUNK.inflatedBuffer, this.rawbuffer);

@@ -1,12 +1,13 @@
 package com.bergerkiller.bukkit.nolagg.lighting;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
-import com.bergerkiller.bukkit.common.reflection.classes.RegionFileCacheRef;
-import com.bergerkiller.bukkit.common.reflection.classes.RegionFileRef;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.LongHashMap;
 import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
+import com.bergerkiller.reflection.net.minecraft.server.NMSRegionFile;
+import com.bergerkiller.reflection.net.minecraft.server.NMSRegionFileCache;
+
 import org.bukkit.Chunk;
 import org.bukkit.World;
 
@@ -47,8 +48,8 @@ public class LightingTaskWorld implements LightingTask {
         }
         // Detect any addition Region Files in the cache that are not yet saved
         // Synchronized, since we are going to iterate the files here...unsafe not to do so!
-        synchronized (RegionFileCacheRef.TEMPLATE.getType()) {
-            for (File file : RegionFileCacheRef.FILES.keySet()) {
+        synchronized (NMSRegionFileCache.T.getType()) {
+            for (File file : NMSRegionFileCache.FILES.keySet()) {
                 if (addedRegionFiles.add(file)) {
                     addRegionFile(file);
                 }
@@ -114,7 +115,7 @@ public class LightingTaskWorld implements LightingTask {
         for (WorldRegion region : this.regions.getValues()) {
             regionChunkCount = 0;
             // Is it contained in the cache? If so, use that to obtain coordinates
-            if ((regionFile = RegionFileCacheRef.FILES.get(region.file)) == null) {
+            if ((regionFile = NMSRegionFileCache.FILES.get(region.file)) == null) {
                 // Start a new file stream to read the coordinates
                 // Creating a new region file is too slow and results in memory leaks
                 try {
@@ -141,7 +142,7 @@ public class LightingTaskWorld implements LightingTask {
                 // Obtain all generated chunks in this region file
                 for (dx = 0; dx < 32; dx++) {
                     for (dz = 0; dz < 32; dz++) {
-                        if (RegionFileRef.exists.invoke(regionFile, dx, dz)) {
+                        if (NMSRegionFile.exists.invoke(regionFile, dx, dz)) {
                             // Region file exists - add it
                             chunks.add(region.rx + dx, region.rz + dz);
                             regionChunkCount++;

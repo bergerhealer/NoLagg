@@ -1,8 +1,8 @@
 package com.bergerkiller.bukkit.nolagg.lighting;
 
 import com.bergerkiller.bukkit.common.bases.NibbleArrayBase;
-import com.bergerkiller.bukkit.common.reflection.classes.ChunkSectionRef;
-import com.bergerkiller.bukkit.common.wrappers.BlockInfo;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.reflection.net.minecraft.server.NMSChunkSection;
 
 public class LightingChunkSection {
     public final LightingChunk owner;
@@ -22,14 +22,14 @@ public class LightingChunkSection {
         this.opacity = new NibbleArrayBase();
         int x, y, z, opacity, maxlight, light, blockEmission;
         boolean withinBounds;
-        BlockInfo info;
+        BlockData info;
         for (x = 0; x < 16; x++) {
             for (z = 0; z < 16; z++) {
                 withinBounds = x >= owner.startX && x <= owner.endX && z >= owner.startZ && z <= owner.endZ;
                 for (y = 0; y < 16; y++) {
                     info = readBlock(blockIds, x, y, z);
                     opacity = info.getOpacity() & 0xf;
-                    blockEmission = info.getLightEmission();
+                    blockEmission = info.getEmission();
                     if (withinBounds) {
                         // Within bounds: Regenerate (skylight is regenerated elsewhere)
                         this.opacity.set(x, y, z, opacity);
@@ -60,8 +60,8 @@ public class LightingChunkSection {
         }
     }
 
-    private static BlockInfo readBlock(byte[] blockIds, int x, int y, int z) {
-        return BlockInfo.get(blockIds[y << 8 | z << 4 | x] & 255);
+    private static BlockData readBlock(byte[] blockIds, int x, int y, int z) {
+        return BlockData.fromTypeIdAndData(blockIds[y << 8 | z << 4 | x] & 255, 0);
     }
 
     /**
@@ -96,9 +96,9 @@ public class LightingChunkSection {
      * @param chunkSection to save to
      */
     public void saveToChunk(Object chunkSection) {
-        ChunkSectionRef.blockLight.set(chunkSection, blockLight.toHandle());
+        NMSChunkSection.blockLight.set(chunkSection, blockLight.toHandle());
         if (skyLight != null) {
-            ChunkSectionRef.skyLight.set(chunkSection, skyLight.toHandle());
+            NMSChunkSection.skyLight.set(chunkSection, skyLight.toHandle());
         }
     }
 }

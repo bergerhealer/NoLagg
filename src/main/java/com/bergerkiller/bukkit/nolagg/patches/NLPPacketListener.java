@@ -8,11 +8,12 @@ import com.bergerkiller.bukkit.common.events.PacketSendEvent;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
-import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
+import com.bergerkiller.reflection.net.minecraft.server.NMSWorldServer;
+
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Minecart;
@@ -63,7 +64,7 @@ public class NLPPacketListener implements PacketListener {
                 } else {
                     return;
                 }
-                IntHashMap<Object> entitiesById = WorldServerRef.entitiesById.get(Conversion.toWorldHandle.convert(event.getPlayer().getWorld()));
+                IntHashMap<Object> entitiesById = NMSWorldServer.entitiesById.get(Conversion.toWorldHandle.convert(event.getPlayer().getWorld()));
                 Entity entity = Conversion.toEntity.convert(entitiesById.get(entityId));
                 if (entity == null || !(entity instanceof Boat || entity instanceof Minecart || EntityUtil.isMob(entity))) {
                     return;
@@ -74,13 +75,13 @@ public class NLPPacketListener implements PacketListener {
                 }
                 // Let's go and fix up this packet!
                 if (mob) {
-                    packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.x, controller.locSynched.getX());
-                    packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.y, controller.locSynched.getY());
-                    packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.z, controller.locSynched.getZ());
+                    packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.x, EntityNetworkController.locProt(controller.locSynched.getX()));
+                    packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.y, EntityNetworkController.locProt(controller.locSynched.getY()));
+                    packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.z, EntityNetworkController.locProt(controller.locSynched.getZ()));
                 } else if (vehicle) {
-                    packet.write(PacketType.OUT_ENTITY_SPAWN.x, controller.locSynched.getX());
-                    packet.write(PacketType.OUT_ENTITY_SPAWN.y, controller.locSynched.getY());
-                    packet.write(PacketType.OUT_ENTITY_SPAWN.z, controller.locSynched.getZ());
+                    packet.write(PacketType.OUT_ENTITY_SPAWN.x, EntityNetworkController.locProt(controller.locSynched.getX()));
+                    packet.write(PacketType.OUT_ENTITY_SPAWN.y, EntityNetworkController.locProt(controller.locSynched.getY()));
+                    packet.write(PacketType.OUT_ENTITY_SPAWN.z, EntityNetworkController.locProt(controller.locSynched.getZ()));
                 }
             }
         }

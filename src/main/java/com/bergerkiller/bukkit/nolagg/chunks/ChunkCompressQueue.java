@@ -7,7 +7,6 @@ import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
 
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -73,14 +72,7 @@ public class ChunkCompressQueue {
         } else {
             // Let the server itself deal with it
             CommonPacket packet = null;
-            try {
-                packet = PacketType.OUT_MAP_CHUNK_BULK.newInstance(Arrays.asList(chunk));
-            } catch (NullPointerException ex) {
-            }
-            if (packet == null || packet.getHandle() == null) {
-                // Something is up in the 1.5.2 version - this'll temporarily fix it
-                packet = PacketType.OUT_MAP_CHUNK.newInstance(chunk);
-            }
+            packet = PacketType.OUT_MAP_CHUNK.newInstance(chunk);
             this.enqueue(new ChunkSendCommand(packet, chunk));
         }
     }

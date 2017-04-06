@@ -2,9 +2,10 @@ package com.bergerkiller.bukkit.nolagg.chunks;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.reflection.classes.VectorRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
+import com.bergerkiller.reflection.net.minecraft.server.NMSVector;
+
 import org.bukkit.Chunk;
 import org.bukkit.block.BlockFace;
 
@@ -151,8 +152,8 @@ public class ChunkCoordComparator implements Comparator<Object> {
         } else if (coord instanceof ChunkSendCommand) {
             ChunkSendCommand cmd = (ChunkSendCommand) coord;
             return getIndex(cmd.chunk.getX(), cmd.chunk.getZ());
-        } else if (VectorRef.isPair(coord)) {
-            return getIndex(VectorRef.getPairX(coord), VectorRef.getPairZ(coord));
+        } else if (NMSVector.isPair(coord)) {
+            return getIndex(NMSVector.getPairX(coord), NMSVector.getPairZ(coord));
         } else {
             final IntVector2 i2coord = Conversion.toIntVector2.convert(coord);
             if (coord != null) {

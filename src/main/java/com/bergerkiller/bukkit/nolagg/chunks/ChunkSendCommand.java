@@ -2,10 +2,10 @@ package com.bergerkiller.bukkit.nolagg.chunks;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
-import com.bergerkiller.bukkit.common.reflection.classes.ChunkRef;
-import com.bergerkiller.bukkit.common.utils.BlockUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
+import com.bergerkiller.reflection.net.minecraft.server.NMSChunk;
+import com.bergerkiller.reflection.net.minecraft.server.NMSTileEntity;
 
 public class ChunkSendCommand {
     public final org.bukkit.Chunk chunk;
@@ -30,8 +30,8 @@ public class ChunkSendCommand {
         // Send tile entities
         CommonPacket packet;
         final Object chunkHandle = Conversion.toChunkHandle.convert(chunk);
-        for (Object tile : ChunkRef.tileEntities.get(chunkHandle).values()) {
-            if ((packet = BlockUtil.getUpdatePacket(tile)) != null) {
+        for (Object tile : NMSChunk.tileEntities.get(chunkHandle).values()) {
+            if ((packet = NMSTileEntity.getUpdatePacket(tile)) != null) {
                 PacketUtil.sendPacket(queue.player, packet);
             }
         }

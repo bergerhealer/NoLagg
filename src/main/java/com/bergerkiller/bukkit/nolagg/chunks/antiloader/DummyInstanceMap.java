@@ -1,9 +1,17 @@
 package com.bergerkiller.bukkit.nolagg.chunks.antiloader;
 
-import com.bergerkiller.bukkit.common.bases.LongHashMapBase;
-import com.bergerkiller.bukkit.common.reflection.classes.LongHashMapRef;
-import com.bergerkiller.bukkit.common.wrappers.LongHashMap;
+import java.util.HashMap;
 
+public class DummyInstanceMap extends HashMap<Long, Object> {
+    public static boolean ENABLED = false;
+    private final DummyPlayerManager manager;
+
+    public DummyInstanceMap(Object oldMap, DummyPlayerManager playerManager) {
+        this.manager = playerManager;
+    }
+}
+
+/*
 public class DummyInstanceMap extends LongHashMapBase {
     public static boolean ENABLED = false;
     private final DummyPlayerManager manager;
@@ -24,3 +32,4 @@ public class DummyInstanceMap extends LongHashMapBase {
         super.put(key, value);
     }
 }
+*/

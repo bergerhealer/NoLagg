@@ -4,7 +4,8 @@ import com.bergerkiller.bukkit.common.ToggledState;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.utils.*;
-import com.bergerkiller.bukkit.common.wrappers.BlockInfo;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -78,7 +79,7 @@ public class CustomExplosion {
                     z = slot.block.pos.z + zoff;
                     slot.block.type = WorldUtil.getBlockType(world, x, y, z);
                     if (slot.block.type != Material.AIR) {
-                        slot.block.damagefactor = (BlockInfo.get(slot.block.type).getDamageResilience(source) + 0.3F) * 0.3F;
+                        slot.block.damagefactor = (BlockData.fromMaterial(slot.block.type).getDamageResilience(source) + 0.3F) * 0.3F;
                         slot.block.damagefactor *= (2.0F + worldRandom.nextFloat()) / 3.0F;
                     } else {
                         slot.block.destroyed.set(); // prevent air getting destroyed by marking it as destroyed already
@@ -264,9 +265,9 @@ public class CustomExplosion {
 
             // CraftBukkit - stop explosions from putting out fire
             if (type != Material.AIR && !MaterialUtil.isType(type, Material.FIRE)) {
-                final BlockInfo info = BlockInfo.get(block);
-                info.destroy(block, event.getYield());
-                info.ignite(block);
+                final BlockData data = WorldUtil.getBlockData(block);
+                data.destroy(block, event.getYield());
+                data.ignite(block);
             }
             if (this.fire) {
                 Material typeBelow = WorldUtil.getBlockType(this.world, x, y - 1, z);

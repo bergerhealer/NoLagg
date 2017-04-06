@@ -8,7 +8,7 @@ import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
-import com.bergerkiller.bukkit.common.wrappers.BlockInfo;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.nolagg.NoLagg;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -196,7 +196,7 @@ public class TNTHandler {
                         if (type == Material.TNT) {
                             detonate(b);
                         } else if (type != Material.FIRE) {
-                            BlockInfo.get(type).destroy(b, yield);
+                            BlockData.fromMaterial(type).destroy(b, yield);
                         }
                     }
                     if (sentExplosions < explosionRate) {
@@ -209,7 +209,7 @@ public class TNTHandler {
                         // Sound (with random pitch)
                         final Random random = WorldUtil.getRandom(at.getWorld());
                         final float pitch = (1.0f + (random.nextFloat() - random.nextFloat()) * 0.2f) * 0.7f;
-                        at.getWorld().playSound(at, Sound.EXPLODE, 4.0f, pitch);
+                        at.getWorld().playSound(at, Sound.ENTITY_GENERIC_EXPLODE, 4.0f, pitch);
                     }
                 } catch (Throwable t) {
                     NoLaggTNT.plugin.log(Level.WARNING, "Explosion did not go as planned!");

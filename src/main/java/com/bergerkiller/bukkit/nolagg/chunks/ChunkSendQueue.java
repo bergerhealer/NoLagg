@@ -5,13 +5,14 @@ import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.ToggledState;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.reflection.classes.EntityPlayerRef;
-import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
-import com.bergerkiller.bukkit.common.reflection.classes.NetworkManagerRef;
-import com.bergerkiller.bukkit.common.reflection.classes.PlayerConnectionRef;
 import com.bergerkiller.bukkit.common.utils.*;
 import com.bergerkiller.bukkit.nolagg.NoLagg;
 import com.bergerkiller.bukkit.nolagg.NoLaggUtil;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEntityPlayer;
+import com.bergerkiller.reflection.net.minecraft.server.NMSNetworkManager;
+import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerConnection;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -53,13 +54,23 @@ public class ChunkSendQueue extends ChunkSendQueueBase {
         this.world = player.getWorld();
         this.sendDirection = null; // Force a sorting operation the next tick
         Object playerHandle = Conversion.toEntityHandle.convert(player);
-        this.x = (int) (EntityRef.locX.get(playerHandle) + EntityRef.motX.get(playerHandle) * 16) >> 4;
-        this.z = (int) (EntityRef.locZ.get(playerHandle) + EntityRef.motZ.get(playerHandle) * 16) >> 4;
+        this.x = (int) (NMSEntity.locX.get(playerHandle) + NMSEntity.motX.get(playerHandle) * 16) >> 4;
+        this.z = (int) (NMSEntity.locZ.get(playerHandle) + NMSEntity.motZ.get(playerHandle) * 16) >> 4;
         this.chunkQueue = new ChunkCompressQueue(this);
-        this.addAll(EntityPlayerRef.chunkQueue.get(playerHandle));
-        this.add(new IntVector2(EntityRef.chunkX.get(playerHandle), EntityRef.chunkZ.get(playerHandle)));
+        this.addAll(getChunkQueue(playerHandle));
+        this.add(new IntVector2(NMSEntity.chunkX.get(playerHandle), NMSEntity.chunkZ.get(playerHandle)));
         ChunkCompressionThread.addQueue(this.chunkQueue);
         this.enforceBufferFullSize();
+    }
+
+    @Deprecated
+    private static List getChunkQueue(Object playerHandle) {
+        throw new RuntimeException("Im sorry, shits broke");
+    }
+
+    @Deprecated
+    private static void setChunkQueue(Object playerHandle, List queue) {
+        throw new RuntimeException("Im sorry, shits broke");
     }
 
     public static void init() {
@@ -74,25 +85,25 @@ public class ChunkSendQueue extends ChunkSendQueueBase {
         for (Player player : CommonUtil.getOnlinePlayers()) {
             ChunkSendQueue queue = get(player);
             if (queue != null) {
-                EntityPlayerRef.chunkQueue.set(Conversion.toEntityHandle.convert(player), queue.toLinkedList());
+                setChunkQueue(Conversion.toEntityHandle.convert(player), queue.toLinkedList());
             }
         }
     }
 
     public static ChunkSendQueue get(Player player) {
         Object ep = Conversion.toEntityHandle.convert(player);
-        return CommonUtil.tryCast(EntityPlayerRef.chunkQueue.get(ep), ChunkSendQueue.class);
+        return CommonUtil.tryCast(getChunkQueue(ep), ChunkSendQueue.class);
     }
 
     public static ChunkSendQueue bind(Player with) {
         Object ep = Conversion.toEntityHandle.convert(with);
-        List<?> currqueue = EntityPlayerRef.chunkQueue.get(ep);
+        List<?> currqueue = getChunkQueue(ep);
         if (currqueue instanceof ChunkSendQueue) {
             return (ChunkSendQueue) currqueue;
         } else {
             ChunkSendQueue queue = new ChunkSendQueue(with);
             currqueue.clear();
-            EntityPlayerRef.chunkQueue.set(ep, queue);
+            setChunkQueue(ep, queue);
             return queue;
         }
     }
@@ -112,10 +123,10 @@ public class ChunkSendQueue extends ChunkSendQueueBase {
 
     private void enforceBufferFullSize() {
         final Object playerHandle = Conversion.toEntityHandle.convert(player);
-        final Object playerConnection = EntityPlayerRef.playerConnection.get(playerHandle);
-        final Object nm = PlayerConnectionRef.networkManager.get(playerConnection);
+        final Object playerConnection = NMSEntityPlayer.playerConnection.get(playerHandle);
+        final Object nm = NMSPlayerConnection.networkManager.get(playerConnection);
         // We can only work on Network manager implementations, INetworkManager implementations are unknown to us
-        if (!NetworkManagerRef.TEMPLATE.isInstance(nm)) {
+        if (!NMSNetworkManager.T.isInstance(nm)) {
             return;
         }
     }

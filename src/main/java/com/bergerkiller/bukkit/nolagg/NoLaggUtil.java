@@ -1,18 +1,18 @@
 package com.bergerkiller.bukkit.nolagg;
 
 import com.bergerkiller.bukkit.common.Common;
-import com.bergerkiller.bukkit.common.reflection.*;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.reflection.MethodAccessor;
+import com.bergerkiller.reflection.SafeDirectMethod;
+import com.bergerkiller.reflection.SafeMethod;
+
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.EventExecutor;
-import org.bukkit.plugin.RegisteredListener;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 
 public class NoLaggUtil {
-    public static final FieldAccessor<EventExecutor> exefield = new SafeField<EventExecutor>(RegisteredListener.class, "executor");
     public static final MethodAccessor<Class<?>> getEventClass;
 
     static {

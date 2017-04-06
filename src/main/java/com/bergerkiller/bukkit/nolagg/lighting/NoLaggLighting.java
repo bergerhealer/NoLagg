@@ -2,11 +2,12 @@ package com.bergerkiller.bukkit.nolagg.lighting;
 
 import com.bergerkiller.bukkit.common.config.ConfigurationNode;
 import com.bergerkiller.bukkit.common.permissions.NoPermissionException;
-import com.bergerkiller.bukkit.common.reflection.classes.RegionFileCacheRef;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.nolagg.NoLaggComponent;
 import com.bergerkiller.bukkit.nolagg.Permission;
+import com.bergerkiller.reflection.net.minecraft.server.NMSRegionFileCache;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -63,7 +64,7 @@ public class NoLaggLighting extends NoLaggComponent {
             }
             // Obtain the region folder
             File regionFolder = WorldUtil.getWorldRegionFolder(world.getName());
-            if (regionFolder == null && WorldUtil.getChunks(world).isEmpty() && RegionFileCacheRef.FILES.isEmpty()) {
+            if (regionFolder == null && WorldUtil.getChunks(world).isEmpty() && NMSRegionFileCache.FILES.isEmpty()) {
                 sender.sendMessage(ChatColor.RED + "World " + world.getName() + " contains no loaded chunks neither any offline-stored regions files to read");
                 sender.sendMessage(ChatColor.RED + "This could be a bug in the program, or it could be that there really are no regions generated (yet?)");
                 return true;

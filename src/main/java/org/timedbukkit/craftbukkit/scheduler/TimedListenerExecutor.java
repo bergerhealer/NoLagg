@@ -1,9 +1,10 @@
 package org.timedbukkit.craftbukkit.scheduler;
 
 import com.bergerkiller.bukkit.common.proxies.ProxyBase;
-import com.bergerkiller.bukkit.nolagg.NoLaggUtil;
 import com.bergerkiller.bukkit.nolagg.examine.ListenerMeasurement;
 import com.bergerkiller.bukkit.nolagg.examine.PluginLogger;
+import com.bergerkiller.reflection.org.bukkit.BRegisteredListener;
+
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventException;
@@ -24,7 +25,7 @@ public class TimedListenerExecutor extends ProxyBase<EventExecutor> implements E
     public void execute(Listener listener, Event event) throws EventException {
         if (!logger.isRunning() || !(event instanceof Cancellable)) {
             // Disable this listening executor
-            NoLaggUtil.exefield.set(meas.listener, base);
+            BRegisteredListener.executor.set(meas.listener, base);
             // Execute like normal
             base.execute(listener, event);
             return;

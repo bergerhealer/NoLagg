@@ -10,6 +10,8 @@ import com.bergerkiller.bukkit.nolagg.*;
 import com.bergerkiller.bukkit.nolagg.itembuffer.ItemMap;
 import com.bergerkiller.bukkit.nolagg.tnt.NoLaggTNT;
 import com.bergerkiller.bukkit.nolagg.tnt.TNTHandler;
+import com.bergerkiller.reflection.org.bukkit.BRegisteredListener;
+
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.*;
@@ -209,11 +211,7 @@ public class NoLaggCommon extends NoLaggComponent {
                     int cz = p.getLocation().getBlockZ() >> 4;
                     for (int a = -radius; a <= radius; a++) {
                         for (int b = -radius; b <= radius; b++) {
-                            for (Player player : WorldUtil.getPlayers(p.getWorld())) {
-                                if (PlayerUtil.isNearChunk(player, cx + a, cz + b, CommonUtil.VIEW)) {
-                                    PlayerUtil.queueChunkSend(player, cx + a, cz + b);
-                                }
-                            }
+                            WorldUtil.queueChunkSend(p.getWorld(), cx + a, cz + b);
                         }
                     }
                     // Make sure all entities are re-sent as well
@@ -233,9 +231,9 @@ public class NoLaggCommon extends NoLaggComponent {
 
                 // Register unloader hook to see what plugins are canceling what unloads
                 for (RegisteredListener listener : ChunkUnloadEvent.getHandlerList().getRegisteredListeners()) {
-                    EventExecutor baseExec = NoLaggUtil.exefield.get(listener);
+                    EventExecutor baseExec = BRegisteredListener.executor.get(listener);
                     EventExecutor hookExec = new CancelCounterExecutor(baseExec, listener.getPlugin());
-                    NoLaggUtil.exefield.set(listener, hookExec);
+                    BRegisteredListener.executor.set(listener, hookExec);
                 }
 
                 // Obtain a list of all loaded chunks
@@ -274,13 +272,13 @@ public class NoLaggCommon extends NoLaggComponent {
                 HashMap<Plugin, PluginStatistic> pluginStatistics = new HashMap<Plugin, PluginStatistic>();
                 for (RegisteredListener listener : ChunkUnloadEvent.getHandlerList().getRegisteredListeners()) {
                     // Obtain and validate the registered hooks
-                    CancelCounterExecutor hookExec = CommonUtil.tryCast(NoLaggUtil.exefield.get(listener), CancelCounterExecutor.class);
+                    CancelCounterExecutor hookExec = CommonUtil.tryCast(BRegisteredListener.executor.get(listener), CancelCounterExecutor.class);
                     if (hookExec == null) {
                         continue;
                     }
                     // Unhook
                     EventExecutor baseExec = hookExec.getProxyBase();
-                    NoLaggUtil.exefield.set(listener, baseExec);
+                    BRegisteredListener.executor.set(listener, baseExec);
                     // Gather data
                     PluginStatistic stat = pluginStatistics.get(hookExec.owner);
                     if (stat == null) {

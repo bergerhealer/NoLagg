@@ -1,9 +1,10 @@
 package com.bergerkiller.bukkit.nolagg.lighting;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.reflection.classes.ChunkRef;
-import com.bergerkiller.bukkit.common.reflection.classes.ChunkSectionRef;
-import com.bergerkiller.bukkit.common.reflection.classes.NibbleArrayRef;
+import com.bergerkiller.reflection.net.minecraft.server.NMSChunk;
+import com.bergerkiller.reflection.net.minecraft.server.NMSChunkSection;
+import com.bergerkiller.reflection.net.minecraft.server.NMSNibbleArray;
+
 import org.bukkit.Chunk;
 
 import java.util.logging.Level;
@@ -67,25 +68,22 @@ public class LightingChunk {
         }
     }
 
-    private void fillSection(int section, byte[] skyLight, byte[] blockLight, byte[] blockIds) {
+    private void fillSection(int section, Object chunkSection) {
+        Object blockLightNibble = NMSChunkSection.getBlockLightNibble.invoke(chunkSection);
+        Object skyLightNibble = NMSChunkSection.getSkyLightNibble.invoke(chunkSection);
+        byte[] skyLight = skyLightNibble == null ? null : NMSNibbleArray.getArrayCopy(skyLightNibble);
+        byte[] blockLight = NMSNibbleArray.getArrayCopy(blockLightNibble);
+        byte[] blockIds = NMSChunkSection.exportBlockData(chunkSection).blockIds;
+
         sections[section] = new LightingChunkSection(this, skyLight, blockLight, blockIds);
         if (skyLight == null) {
             hasSkyLight = false;
         }
     }
 
-    private void fillSection(int section, Object chunkSection) {
-        Object blockLightNibble = ChunkSectionRef.getBlockLightNibble.invoke(chunkSection);
-        Object skyLightNibble = ChunkSectionRef.getSkyLightNibble.invoke(chunkSection);
-        byte[] skyLight = skyLightNibble == null ? null : NibbleArrayRef.getArrayCopy(skyLightNibble);
-        byte[] blockLight = NibbleArrayRef.getArrayCopy(blockLightNibble);
-        byte[] blockIds = ChunkSectionRef.getBlockIds.invoke(chunkSection);
-        fillSection(section, skyLight, blockLight, blockIds);
-    }
-
     public void fill(Chunk chunk) {
         // Fill using chunk sections
-        final Object[] chunkSections = ChunkRef.sections.invoke(Conversion.toChunkHandle.convert(chunk));
+        final Object[] chunkSections = NMSChunk.sections.invoke(Conversion.toChunkHandle.convert(chunk));
         for (int section = 0; section < SECTION_COUNT; section++) {
             if (chunkSections[section] != null) {
                 fillSection(section, chunkSections[section]);
@@ -280,7 +278,7 @@ public class LightingChunk {
      * @param chunk to save to
      */
     public void saveToChunk(Chunk chunk) {
-        final Object[] chunkSections = ChunkRef.sections.invoke(Conversion.toChunkHandle.convert(chunk));
+        final Object[] chunkSections = NMSChunk.sections.invoke(Conversion.toChunkHandle.convert(chunk));
         for (int section = 0; section < SECTION_COUNT; section++) {
             if (chunkSections[section] != null && sections[section] != null) {
                 sections[section].saveToChunk(chunkSections[section]);

@@ -1,14 +1,10 @@
 package com.bergerkiller.bukkit.nolagg.lighting;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.bukkit.common.utils.EntityUtil;
-import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import org.bukkit.Chunk;
 import org.bukkit.World;
-import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -157,14 +153,8 @@ public class LightingTaskBatch implements LightingTask {
                     Chunk bchunk = world.getChunkAt(lc.chunkX, lc.chunkZ);
                     // Save to chunk
                     lc.saveToChunk(bchunk);
-                    // Resent to players
-                    boolean isPlayerNear = false;
-                    for (Player player : WorldUtil.getPlayers(world)) {
-                        if (EntityUtil.isNearChunk(player, lc.chunkX, lc.chunkZ, CommonUtil.VIEW)) {
-                            isPlayerNear = true;
-                            PlayerUtil.queueChunkSend(player, lc.chunkX, lc.chunkZ);
-                        }
-                    }
+                    // Resend to players
+                    boolean isPlayerNear = WorldUtil.queueChunkSend(world, lc.chunkX, lc.chunkZ);
                     // Try to unload if no player near
                     LightingTaskBatch.this.chunksCoords.remove(lc.chunkX, lc.chunkZ);
                     if (!isPlayerNear) {

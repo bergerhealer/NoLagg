@@ -1,8 +1,9 @@
 package com.bergerkiller.bukkit.nolagg.examine;
 
-import com.bergerkiller.bukkit.common.reflection.classes.CraftSchedulerRef;
-import com.bergerkiller.bukkit.common.reflection.classes.CraftTaskRef;
 import com.bergerkiller.bukkit.nolagg.NoLagg;
+import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftScheduler;
+import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftTask;
+
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.timedbukkit.craftbukkit.scheduler.TimedWrapper;
@@ -20,23 +21,23 @@ public class SchedulerWatcher extends PriorityQueue {
     }
 
     public static void init(PluginLogger logger) {
-        CraftSchedulerRef.pending.set(Bukkit.getScheduler(), new SchedulerWatcher(CraftSchedulerRef.pending.get(Bukkit.getScheduler()), logger));
+        CBCraftScheduler.pending.set(Bukkit.getScheduler(), new SchedulerWatcher(CBCraftScheduler.pending.get(Bukkit.getScheduler()), logger));
     }
 
     public static void deinit() {
         // Obtain a blank new Queue with the elements of the original, and filter out timed wrappers
-        PriorityQueue<Object> queue = new PriorityQueue<Object>(CraftSchedulerRef.pending.get(Bukkit.getScheduler()));
+        PriorityQueue<Object> queue = new PriorityQueue<Object>(CBCraftScheduler.pending.get(Bukkit.getScheduler()));
         for (Object element : queue) {
             // Remove the timed wrapper if needed
-            if (CraftTaskRef.TEMPLATE.isType(element)) {
-                Runnable run = CraftTaskRef.task.get(element);
+            if (CBCraftTask.T.isType(element)) {
+                Runnable run = CBCraftTask.task.get(element);
                 if (run instanceof TimedWrapper) {
-                    CraftTaskRef.task.set(element, ((TimedWrapper) run).getProxyBase());
+                    CBCraftTask.task.set(element, ((TimedWrapper) run).getProxyBase());
                 }
             }
         }
         // Set in the server
-        CraftSchedulerRef.pending.set(Bukkit.getScheduler(), queue);
+        CBCraftScheduler.pending.set(Bukkit.getScheduler(), queue);
     }
 
     @Override
@@ -49,12 +50,12 @@ public class SchedulerWatcher extends PriorityQueue {
             return null;
         }
         try {
-            if (CraftTaskRef.TEMPLATE.isType(o)) {
-                Runnable run = CraftTaskRef.task.get(o);
+            if (CBCraftTask.T.isType(o)) {
+                Runnable run = CBCraftTask.task.get(o);
                 if (run != null && !logger.isIgnoredTask(run)) {
-                    Plugin plugin = CraftTaskRef.plugin.get(o);
+                    Plugin plugin = CBCraftTask.plugin.get(o);
                     if (plugin != null && plugin.isEnabled()) {
-                        CraftTaskRef.task.set(o, logger.getWrapper(run, plugin));
+                        CBCraftTask.task.set(o, logger.getWrapper(run, plugin));
                     }
                 }
             }

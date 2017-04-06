@@ -2,10 +2,11 @@ package com.bergerkiller.bukkit.nolagg.chunks.antiloader;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.reflection.classes.PlayerChunkRef;
 import com.bergerkiller.bukkit.common.utils.ChunkUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.nolagg.chunks.ChunkSendQueue;
+import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerChunk;
+
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -21,9 +22,9 @@ public class DummyInstancePlayerList extends ArrayList {
     public static void replace(DummyPlayerManager playerManager, Object playerInstance) {
         DummyInstancePlayerList list = new DummyInstancePlayerList();
         list.playerManager = playerManager;
-        list.location = Conversion.toIntVector2.convert(PlayerChunkRef.location.get(playerInstance));
-        list.addAll(PlayerChunkRef.players.get(playerInstance));
-        PlayerChunkRef.players.set(playerInstance, list);
+        list.location = Conversion.toIntVector2.convert(NMSPlayerChunk.location.get(playerInstance));
+        list.addAll(NMSPlayerChunk.players.get(playerInstance));
+        NMSPlayerChunk.players.set(playerInstance, list);
     }
 
     @Override

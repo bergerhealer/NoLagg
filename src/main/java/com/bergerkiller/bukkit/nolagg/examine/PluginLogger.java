@@ -8,7 +8,8 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.TimeUtil;
 import com.bergerkiller.bukkit.nolagg.NoLagg;
-import com.bergerkiller.bukkit.nolagg.NoLaggUtil;
+import com.bergerkiller.reflection.org.bukkit.BRegisteredListener;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -111,9 +112,9 @@ public class PluginLogger {
 
         // Unhook timed listeners from the server
         for (ListenerMeasurement meas : events) {
-            Object exec = NoLaggUtil.exefield.get(meas.listener);
+            Object exec = BRegisteredListener.executor.get(meas.listener);
             if (exec instanceof TimedListenerExecutor) {
-                NoLaggUtil.exefield.set(meas.listener, ((TimedListenerExecutor) exec).getProxyBase());
+                BRegisteredListener.executor.set(meas.listener, ((TimedListenerExecutor) exec).getProxyBase());
             }
         }
     }
@@ -132,7 +133,7 @@ public class PluginLogger {
             for (int i = 0; i < listeners.length; i++) {
                 // Convert to a timed registered listener if needed
                 RegisteredListener listener = listeners[i];
-                EventExecutor exec = NoLaggUtil.exefield.get(listener);
+                EventExecutor exec = BRegisteredListener.executor.get(listener);
                 if (exec == null) {
                     continue;
                 }
@@ -152,7 +153,7 @@ public class PluginLogger {
                 if (exec instanceof TimedListenerExecutor) {
                     ((TimedListenerExecutor) exec).meas = meas;
                 } else {
-                    NoLaggUtil.exefield.set(listener, new TimedListenerExecutor(this, exec, meas));
+                    BRegisteredListener.executor.set(listener, new TimedListenerExecutor(this, exec, meas));
                 }
 
                 // Done
