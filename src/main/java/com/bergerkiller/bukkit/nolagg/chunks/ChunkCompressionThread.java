@@ -5,6 +5,8 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
+import com.bergerkiller.bukkit.common.utils.ChunkUtil;
+import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
 import com.bergerkiller.reflection.MethodAccessor;
 import com.bergerkiller.reflection.net.minecraft.server.NMSChunk;
 import com.bergerkiller.reflection.net.minecraft.server.NMSChunkSection;
@@ -140,9 +142,9 @@ public class ChunkCompressionThread extends AsyncTask {
         boolean hasSkylight = !NMSChunk.hasSkyLight.get(worldProvider);
         // Version which uses the Chunkmap buffer to create the packet
         CommonPacket mapchunk = new CommonPacket(PacketType.OUT_MAP_CHUNK);
-        PacketType.OUT_MAP_CHUNK.x.set(mapchunk.getHandle(), NMSChunk.x.get(chunk));
-        PacketType.OUT_MAP_CHUNK.z.set(mapchunk.getHandle(), NMSChunk.z.get(chunk));
-        PacketType.OUT_MAP_CHUNK.hasBiomeData.set(mapchunk.getHandle(), true); //yes, has biome data
+        mapchunk.write(PacketType.OUT_MAP_CHUNK.x, bchunk.getX());
+        mapchunk.write(PacketType.OUT_MAP_CHUNK.z, bchunk.getZ());
+        mapchunk.write(PacketType.OUT_MAP_CHUNK.hasBiomeData, true); //yes, has biome data
 
         // =====================================
         // =========== Fill with data ==========
@@ -152,7 +154,7 @@ public class ChunkCompressionThread extends AsyncTask {
         int i;
 
         // Calculate the available chunk sections and bitmap
-        Object sections[] = NMSChunk.sections.invoke(chunk);
+        ChunkSection sections[] = ChunkUtil.getSections(bchunk);
         boolean sectionsEmpty[] = new boolean[sections.length];
         for (i = 0; i < sections.length; i++) {
             sectionsEmpty[i] = sections[i] == null || NMSChunkSection.isEmpty.invoke(sections[i]);

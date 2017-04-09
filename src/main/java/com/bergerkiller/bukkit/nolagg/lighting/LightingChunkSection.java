@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.nolagg.lighting;
 
 import com.bergerkiller.bukkit.common.bases.NibbleArrayBase;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
 import com.bergerkiller.reflection.net.minecraft.server.NMSChunkSection;
 
 public class LightingChunkSection {
@@ -10,14 +11,19 @@ public class LightingChunkSection {
     public final NibbleArrayBase blockLight;
     public final NibbleArrayBase opacity;
 
-    public LightingChunkSection(LightingChunk owner, byte[] skyLight, byte[] blockLight, byte[] blockIds) {
+    public LightingChunkSection(LightingChunk owner, ChunkSection chunkSection) {
         this.owner = owner;
-        // Block light
-        //this.blockLight = new NibbleArrayBase(blockLight, 4);
-        this.blockLight = new NibbleArrayBase(blockLight);
-        // Sky light
-        //this.skyLight = skyLight == null ? null : new NibbleArrayBase(skyLight, 4);
-        this.skyLight = skyLight == null ? null : new NibbleArrayBase(skyLight);
+
+        // Block light data
+        this.blockLight = new NibbleArrayBase(chunkSection.getBlockLightData());
+
+        // Sky light data
+        if (chunkSection.hasSkyLight()) {
+            this.skyLight = new NibbleArrayBase(chunkSection.getSkyLightData());
+        } else {
+            this.skyLight = null;
+        }
+
         // Fill opacity and initial block lighting values
         this.opacity = new NibbleArrayBase();
         int x, y, z, opacity, maxlight, light, blockEmission;
@@ -27,7 +33,7 @@ public class LightingChunkSection {
             for (z = 0; z < 16; z++) {
                 withinBounds = x >= owner.startX && x <= owner.endX && z >= owner.startZ && z <= owner.endZ;
                 for (y = 0; y < 16; y++) {
-                    info = readBlock(blockIds, x, y, z);
+                    info = chunkSection.getBlockData(x, y, z);
                     opacity = info.getOpacity() & 0xf;
                     blockEmission = info.getEmission();
                     if (withinBounds) {
@@ -58,10 +64,6 @@ public class LightingChunkSection {
                 }
             }
         }
-    }
-
-    private static BlockData readBlock(byte[] blockIds, int x, int y, int z) {
-        return BlockData.fromTypeIdAndData(blockIds[y << 8 | z << 4 | x] & 255, 0);
     }
 
     /**
@@ -95,10 +97,11 @@ public class LightingChunkSection {
      *
      * @param chunkSection to save to
      */
-    public void saveToChunk(Object chunkSection) {
-        NMSChunkSection.blockLight.set(chunkSection, blockLight.toHandle());
+    public void saveToChunk(ChunkSection chunkSection) {
+        Object handle = chunkSection.getHandle();
+        NMSChunkSection.blockLight.set(handle, blockLight.toHandle());
         if (skyLight != null) {
-            NMSChunkSection.skyLight.set(chunkSection, skyLight.toHandle());
+            NMSChunkSection.skyLight.set(handle, skyLight.toHandle());
         }
     }
 }

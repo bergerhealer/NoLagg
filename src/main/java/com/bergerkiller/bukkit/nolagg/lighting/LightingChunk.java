@@ -1,9 +1,7 @@
 package com.bergerkiller.bukkit.nolagg.lighting;
 
-import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.reflection.net.minecraft.server.NMSChunk;
-import com.bergerkiller.reflection.net.minecraft.server.NMSChunkSection;
-import com.bergerkiller.reflection.net.minecraft.server.NMSNibbleArray;
+import com.bergerkiller.bukkit.common.utils.ChunkUtil;
+import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
 
 import org.bukkit.Chunk;
 
@@ -68,25 +66,14 @@ public class LightingChunk {
         }
     }
 
-    private void fillSection(int section, Object chunkSection) {
-        Object blockLightNibble = NMSChunkSection.getBlockLightNibble.invoke(chunkSection);
-        Object skyLightNibble = NMSChunkSection.getSkyLightNibble.invoke(chunkSection);
-        byte[] skyLight = skyLightNibble == null ? null : NMSNibbleArray.getArrayCopy(skyLightNibble);
-        byte[] blockLight = NMSNibbleArray.getArrayCopy(blockLightNibble);
-        byte[] blockIds = NMSChunkSection.exportBlockData(chunkSection).blockIds;
-
-        sections[section] = new LightingChunkSection(this, skyLight, blockLight, blockIds);
-        if (skyLight == null) {
-            hasSkyLight = false;
-        }
-    }
-
     public void fill(Chunk chunk) {
         // Fill using chunk sections
-        final Object[] chunkSections = NMSChunk.sections.invoke(Conversion.toChunkHandle.convert(chunk));
+        ChunkSection[] chunkSections = ChunkUtil.getSections(chunk);
         for (int section = 0; section < SECTION_COUNT; section++) {
-            if (chunkSections[section] != null) {
-                fillSection(section, chunkSections[section]);
+            ChunkSection chunkSection = chunkSections[section];
+            if (chunkSection != null) {
+                hasSkyLight &= chunkSection.hasSkyLight();
+                sections[section] = new LightingChunkSection(this, chunkSection);
             }
         }
         this.isFilled = true;
@@ -204,7 +191,13 @@ public class LightingChunk {
         int loops = 0;
         int lasterrx = 0, lasterry = 0, lasterrz = 0;
         final int maxY = getTopY();
-        boolean haserror, haderror = false;
+        boolean haserror;
+
+        boolean err_neigh_nx = false;
+        boolean err_neigh_px = false;
+        boolean err_neigh_ny = false;
+        boolean err_neigh_py = false;
+
         LightingChunkSection chunksection;
         // Keep spreading the light in this chunk until it is done
         do {
@@ -225,6 +218,7 @@ public class LightingChunk {
                     startY = skyLight ? getHeight(x, z) : maxY;
                     for (y = startY; y > 0; y--) {
                         if ((chunksection = this.sections[y >> 4]) == null) {
+                            y = ((y >> 4) - 1) << 4; // skip section
                             continue;
                         }
                         factor = Math.max(1, chunksection.opacity.get(x, y & 0xf, z));
@@ -247,27 +241,37 @@ public class LightingChunk {
                             lasterrx = x;
                             lasterry = y;
                             lasterrz = z;
+                            err_neigh_nx |= (x == 0);
+                            err_neigh_ny |= (y == 0);
+                            err_neigh_px |= (x == 15);
+                            err_neigh_py |= (y == 15);
                             haserror = true;
                         }
                     }
                 }
             }
-            haderror |= haserror;
         } while (haserror);
+
         if (skyLight) {
             this.isSkyLightDirty = false;
         } else {
             this.isBlockLightDirty = false;
         }
-        if (haderror) {
-            for (LightingChunk chunk : neighbors.values) {
-                if (chunk != null) {
-                    if (skyLight) {
-                        chunk.isSkyLightDirty = true;
-                    } else {
-                        chunk.isBlockLightDirty = true;
-                    }
-                }
+
+        // When we change blocks at our chunk borders, neighbours have to do another spread cycle
+        if (err_neigh_nx) markNeighbor(-1, 0, skyLight);
+        if (err_neigh_px) markNeighbor(1, 0, skyLight);
+        if (err_neigh_ny) markNeighbor(0, -1, skyLight);
+        if (err_neigh_py) markNeighbor(0, 1, skyLight);
+    }
+
+    private void markNeighbor(int dx, int dy, boolean skyLight) {
+        LightingChunk n = neighbors.get(dx, dy);
+        if (n != null) {
+            if (skyLight) {
+                n.isSkyLightDirty = true;
+            } else {
+                n.isBlockLightDirty = true;
             }
         }
     }
@@ -278,7 +282,7 @@ public class LightingChunk {
      * @param chunk to save to
      */
     public void saveToChunk(Chunk chunk) {
-        final Object[] chunkSections = NMSChunk.sections.invoke(Conversion.toChunkHandle.convert(chunk));
+        ChunkSection[] chunkSections = ChunkUtil.getSections(chunk);
         for (int section = 0; section < SECTION_COUNT; section++) {
             if (chunkSections[section] != null && sections[section] != null) {
                 sections[section].saveToChunk(chunkSections[section]);
