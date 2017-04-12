@@ -4,7 +4,7 @@
 
     <groupId>com.bergerkiller.bukkit</groupId>
     <artifactId>NoLagg</artifactId>
-    <version>1.92-SNAPSHOT</version>
+    <version>1.11.2-v1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>NoLagg</name>
@@ -13,9 +13,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.mcversion>v1_11_R1</project.mcversion>
-        <project.bversion>1.11.2-R0.1</project.bversion>
-        <project.cbversion>1.11.2-R0.1</project.cbversion>
-        <project.bkcversion>1.8-SNAPSHOT</project.bkcversion>
+        <project.serverversion>1.11.2-R0.1</project.serverversion>
+        <project.bkcversion>1.11.2-v1-SNAPSHOT</project.bkcversion>
     </properties>
 
     <repositories>
@@ -27,8 +26,8 @@
 
         <!-- Repo for access to Vault -->
         <repository>
-        	<id>vault-repo</id>
-        	<url>http://nexus.hc.to/content/repositories/pub_releases</url>
+            <id>vault-repo</id>
+            <url>http://nexus.hc.to/content/repositories/pub_releases</url>
         </repository>
     </repositories>
 
@@ -36,14 +35,14 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>${project.bversion}-SNAPSHOT</version>
+            <version>${project.serverversion}-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>craftbukkit</artifactId>
-            <version>${project.cbversion}-SNAPSHOT</version>
+            <version>${project.serverversion}-SNAPSHOT</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/spigot-1.11.2.jar</systemPath>
+            <systemPath>${project.basedir}/lib/spigot.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.lishid.orebfuscator</groupId>
