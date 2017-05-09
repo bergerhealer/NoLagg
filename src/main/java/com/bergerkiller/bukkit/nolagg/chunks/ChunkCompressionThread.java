@@ -7,7 +7,7 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.ChunkUtil;
 import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
-import com.bergerkiller.reflection.MethodAccessor;
+import com.bergerkiller.mountiplex.reflection.MethodAccessor;
 import com.bergerkiller.reflection.net.minecraft.server.NMSChunk;
 import com.bergerkiller.reflection.net.minecraft.server.NMSChunkSection;
 import com.bergerkiller.reflection.net.minecraft.server.NMSNibbleArray;

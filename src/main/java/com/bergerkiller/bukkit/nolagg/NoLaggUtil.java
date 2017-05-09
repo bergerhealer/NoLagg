@@ -2,9 +2,9 @@ package com.bergerkiller.bukkit.nolagg;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.reflection.MethodAccessor;
-import com.bergerkiller.reflection.SafeDirectMethod;
-import com.bergerkiller.reflection.SafeMethod;
+import com.bergerkiller.mountiplex.reflection.MethodAccessor;
+import com.bergerkiller.mountiplex.reflection.SafeMethod;
+import com.bergerkiller.mountiplex.reflection.SafeDirectMethod;
 
 import org.bukkit.entity.Player;
 
