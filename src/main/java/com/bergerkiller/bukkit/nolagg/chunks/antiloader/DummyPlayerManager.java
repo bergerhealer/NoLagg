@@ -1,7 +1,6 @@
 package com.bergerkiller.bukkit.nolagg.chunks.antiloader;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
-import com.bergerkiller.bukkit.common.bases.PlayerChunkMapBase;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
@@ -22,7 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class DummyPlayerManager extends PlayerChunkMapBase {
-    /* private static final DummyWorldServer DUMMYWORLD = DummyWorldServer.newInstance();*/
+    // private static final DummyWorldServer DUMMYWORLD = DummyWorldServer.newInstance();
     private static final String playerInstanceClassName = CommonUtil.getNMSClass("PlayerChunk").getName();
     public final Object base;
     public final World world;
