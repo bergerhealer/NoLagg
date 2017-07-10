@@ -193,7 +193,7 @@ public class ChunkSendQueue extends ChunkSendQueueBase {
      */
     private void update() {
         // Update queue size
-        this.packetBufferQueueSize = (int) PacketUtil.getPendingBytes(player);
+        this.packetBufferQueueSize = 0; //(int) PacketUtil.getPendingBytes(player);
         // Update current buffer size
         if (this.buffersizeavg == 0) {
             this.buffersizeavg = this.packetBufferQueueSize;

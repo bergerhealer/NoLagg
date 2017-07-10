@@ -47,7 +47,7 @@ public class DummyInstancePlayerList extends ArrayList {
             if (super.isEmpty()) {
                 // Remove this player instance from the player manager
                 this.playerManager.removeInstance(this.location);
-                ChunkUtil.setChunkUnloading(this.playerManager.world, location.x, location.z, true);
+                //ChunkUtil.setChunkUnloading(this.playerManager.world, location.x, location.z, true);
             }
         }
         return false;

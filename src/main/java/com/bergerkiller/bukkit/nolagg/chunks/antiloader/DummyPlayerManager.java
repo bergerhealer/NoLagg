@@ -38,9 +38,10 @@ public class DummyPlayerManager extends PlayerChunkMapBase {
     public DummyPlayerManager(final Object base, World world) {
         super(world, 10);
         this.world = world;
-        this.instances = new DummyInstanceMap(NMSPlayerChunkMap.playerInstances.get(base), this);
-        NMSPlayerChunkMap.playerInstances.setInternal(base, this.instances);
-        NMSPlayerChunkMap.T.transfer(base, this);
+        this.instances = null;
+        //this.instances = new DummyInstanceMap(NMSPlayerChunkMap.playerInstances.get(base), this);
+        //NMSPlayerChunkMap.playerInstances.setInternal(base, this.instances);
+        //NMSPlayerChunkMap.T.transfer(base, this);
         this.base = base;
         this.dirtyChunkQueue = NMSPlayerChunkMap.dirtyBlockChunks.get(base);
     }
